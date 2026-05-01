@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>БизнесКалк</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:     #0c0c12;
+  --bg2:    #13131c;
+  --bg3:    #1c1c2a;
+  --card:   #161620;
+  --border: rgba(255,255,255,0.08);
+  --border2:rgba(255,255,255,0.15);
+  --gold:   #c9a84c;
+  --gold2:  #e8c97a;
+  --text:   #f0ede8;
+  --text2:  #9896a0;
+  --text3:  #55535f;
+  --green:  #3ecf8e;
+  --red:    #f87171;
+  --blue:   #6b9cff;
+  --r:      14px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 40px;
+  background: rgba(12,12,18,0.95);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+.logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+.logo span { color: var(--gold); }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a { font-size: 13px; color: var(--text2); text-decoration: none; }
+.nav-links a:hover { color: var(--text); }
+
+.hero {
+  text-align: center;
+  padding: 80px 24px 60px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.hero-badge {
+  display: inline-block;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 100px;
+  padding: 5px 16px;
+  font-size: 12px;
+  color: var(--gold2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+.hero h1 {
+  font-size: clamp(36px, 6vw, 68px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -2px;
+  margin-bottom: 20px;
+}
+.hero h1 em { color: var(--gold); font-style: normal; }
+.hero p {
+  font-size: 17px;
+  color: var(--text2);
+  max-width: 440px;
+  margin: 0 auto 40px;
+  font-weight: 300;
+}
+.hero-arrow {
+  display: inline-block;
+  font-size: 14px;
+  color: var(--text3);
+  text-decoration: none;
+  animation: bob 2s ease-in-out infinite;
+}
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+
+.stats {
+  display: flex;
+  justify-content: center;
+  max-width: 600px;
+  margin: 0 auto 70px;
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  background: var(--card);
+  overflow: hidden;
+}
+.stat { flex: 1; padding: 22px 20px; text-align: center; border-right: 1px solid var(--border); }
+.stat:last-child { border-right: none; }
+.stat-num { display: block; font-size: 26px; font-weight: 800; color: var(--gold2); }
+.stat-lbl { font-size: 12px; color: var(--text3); margin-top: 3px; }
+
+.main { max-width: 940px; margin: 0 auto; padding: 0 20px 80px; }
+.sec-tag {
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.sec-tag::before { content:''; display:inline-block; width:20px; height:1px; background:var(--text3); }
+.sec-title { font-size: clamp(26px, 4vw, 38px); font-weight: 800; letter-spacing: -1px; margin-bottom: 36px; line-height: 1.2; }
+
+.tabs {
+  display: flex; gap: 6px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 5px; margin-bottom: 28px;
+}
+.tab {
+  flex: 1; padding: 11px 10px;
+  background: transparent; border: none; border-radius: 9px;
+  font-size: 13px; font-weight: 500; color: var(--text3); cursor: pointer; transition: all 0.2s;
+}
+.tab:hover { color: var(--text2); }
+.tab.on { background: var(--bg3); color: var(--text); border: 1px solid var(--border2); }
+
+.panel { display: none; }
+.panel.on { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; }
+.card-head {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text3); padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--border);
+}
+
+.sg { margin-bottom: 22px; }
+.sg-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+.sg-name { font-size: 13px; color: var(--text2); }
+.sg-val { font-size: 15px; font-weight: 700; color: var(--gold2); }
+
+input[type=range] {
+  -webkit-appearance: none; width: 100%; height: 3px;
+  background: var(--bg3); border-radius: 2px; outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px;
+  border-radius: 50%; background: var(--gold); border: 2px solid var(--bg);
+  cursor: pointer; transition: transform 0.15s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+input[type=range]::-moz-range-thumb {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--gold); border: 2px solid var(--bg); cursor: pointer;
+}
+
+.rg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.ri { background: var(--bg3); border-radius: 10px; padding: 16px; border: 1px solid var(--border); }
+.ri-lbl { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+.ri-val { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; }
+.ri-val.g { color: var(--green); }
+.ri-val.r { color: var(--red); }
+.ri-val.a { color: var(--gold2); }
+
+.bg-row { margin-bottom: 13px; }
+.bg-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--text3); margin-bottom: 6px; }
+.bg-top b { color: var(--text2); font-weight: 500; }
+.bg-track { height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+.bg-fill { height: 100%; border-radius: 3px; transition: width 0.35s ease; }
+.f-gold  { background: var(--gold); }
+.f-blue  { background: var(--blue); }
+.f-green { background: var(--green); }
+
+.tip {
+  background: rgba(201,168,76,0.07); border: 1px solid rgba(201,168,76,0.18);
+  border-radius: 10px; padding: 13px 16px; font-size: 13px; color: var(--gold2);
+  line-height: 1.6; margin-top: 18px; display: flex; gap: 8px;
+}
+
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 40px; }
+.step {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 24px 20px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.step:hover { border-color: var(--border2); transform: translateY(-3px); }
+.step-n { font-size: 42px; font-weight: 800; color: rgba(201,168,76,0.1); line-height: 1; margin-bottom: 12px; }
+.step-t { font-size: 15px; font-weight: 700; margin-bottom: 7px; }
+.step-d { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+.cta { text-align: center; padding: 70px 24px 90px; max-width: 520px; margin: 0 auto; }
+.cta h2 { font-size: clamp(24px, 4vw, 42px); font-weight: 800; letter-spacing: -1px; margin-bottom: 14px; }
+.cta p { color: var(--text2); margin-bottom: 32px; }
+.btn {
+  display: inline-block; background: var(--gold); color: #0c0c12;
+  font-size: 15px; font-weight: 700; padding: 15px 38px;
+  border-radius: 100px; text-decoration: none; transition: background 0.2s, transform 0.15s;
+}
+.btn:hover { background: var(--gold2); transform: scale(1.03); }
+
+footer {
+  border-top: 1px solid var(--border); padding: 28px 40px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+footer .fl { font-size: 16px; font-weight: 800; }
+footer .fl span { color: var(--gold); }
+footer p { font-size: 12px; color: var(--text3); }
+
+@media(max-width:680px){
+  .panel.on { grid-template-columns: 1fr; }
+  nav { padding: 14px 16px; }
+  .nav-links { display: none; }
+  .stats { flex-direction: column; }
+  .stat { border-right: none; border-bottom: 1px solid var(--border); }
+  .stat:last-child { border-bottom: none; }
+  .tabs { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Бизнес<span>Калк</span></div>
+  <div class="nav-links">
+    <a href="#calc">Калькуляторы</a>
+    <a href="#how">Как работает</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Бесплатный инструмент</div>
+  <h1>Считай умно.<br><em>Расти быстро.</em></h1>
+  <p>Три калькулятора для бизнеса — ROI рекламы, прибыль и правильная цена услуги.</p>
+  <a href="#calc" class="hero-arrow">↓ Начать расчёт</a>
+</div>
+
+<div class="stats">
+  <div class="stat"><span class="stat-num">3</span><div class="stat-lbl">Калькулятора</div></div>
+  <div class="stat"><span class="stat-num">∞</span><div class="stat-lbl">Сценариев</div></div>
+  <div class="stat"><span class="stat-num">0 $</span><div class="stat-lbl">Стоимость</div></div>
+</div>
+
+<div class="main" id="calc">
+  <div class="sec-tag">Инструменты</div>
+  <div class="sec-title">Выбери калькулятор</div>
+
+  <div class="tabs">
+    <button class="tab on" onclick="sw('roi',this)">📈 ROI рекламы</button>
+    <button class="tab" onclick="sw('profit',this)">💰 Прибыль</button>
+    <button class="tab" onclick="sw('price',this)">🎯 Цена услуги</button>
+  </div>
+
+  <!-- ROI -->
+  <div class="panel on" id="p-roi">
+    <div class="card">
+      <div class="card-head">Параметры рекламы</div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Бюджет в месяц</span><span class="sg-val" id="v-budget">$500</span></div>
+        <input type="range" min="50" max="5000" step="50" value="500" id="s-budget" oninput="roi()">
+      </div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Стоимость клика</span><span class="sg-val" id="v-cpc">$0.30</span></div>
+        <input type="range" min="0.05" max="3.00" step="0.05" value="0.30" id="s-cpc" oninput="roi()">
+      </div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Конверсия сайта</span><span class="sg-val" id="v-conv">3%</span></div>
+        <input type="range" min="1" max="20" step="0.5" value="3" id="s-conv" oninput="roi()">
+      </div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Средний чек</span><span class="sg-val" id="v-check">$80</span></div>
+        <input type="range" min="10" max="2000" step="10" value="80" id="s-check" oninput="roi()">
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head">Результат</div>
+        <div class="rg">
+          <div class="ri"><div class="ri-lbl">Кликов</div><div class="ri-val" id="o-clicks">1 667</div></div>
+          <div class="ri"><div class="ri-lbl">Клиентов</div><div class="ri-val a" id="o-clients">50</div></div>
+          <div class="ri"><div class="ri-lbl">Выручка</div><div class="ri-val g" id="o-revenue">$4 000</div></div>
+          <div class="ri"><div class="ri-lbl">ROI</div><div class="ri-val g" id="o-roi">700%</div></div>
+        </div>
+        <div class="bg-row">
+          <div class="bg-top"><span>Бюджет</span><b id="bb-cost">$500</b></div>
+          <div class="bg-track"><div class="bg-fill f-gold" id="bf-cost" style="width:11%"></div></div>
+        </div>
+        <div class="bg-row">
+          <div class="bg-top"><span>Выручка</span><b id="bb-rev">$4 000</b></div>
+          <div class="bg-track"><div class="bg-fill f-blue" id="bf-rev" style="width:89%"></div></div>
+        </div>
+        <div class="bg-row">
+          <div class="bg-top"><span>Прибыль</span><b id="bb-net">$3 500</b></div>
+          <div class="bg-track"><div class="bg-fill f-green" id="bf-net" style="width:78%"></div></div>
+        </div>
+      </div>
+      <div class="tip">💡 <span id="t-roi">На каждый $1 ты получаешь $8. Отличный результат!</span></div>
+    </div>
+  </div>
+
+  <!-- PROFIT -->
+  <div class="panel" id="p-profit">
+    <div class="card">
+      <div class="card-head">Данные бизнеса</div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Выручка в месяц</span><span class="sg-val" id="v-rev">$3 000</span></div>
+        <input type="range" min="100" max="50000" step="100" value="3000" id="s-rev" oninput="profit()">
+      </div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Себестоимость</span><span class="sg-val" id="v-cogs">40%</span></div>
+        <input type="range" min="0" max="90" step="1" value="40" id="s-cogs" oninput="profit()">
+      </div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Постоянные расходы</span><span class="sg-val" id="v-fixed">$800</span></div>
+        <input type="range" min="0" max="10000" step="100" value="800" id="s-fixed" oninput="profit()">
+      </div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Налоги</span><span class="sg-val" id="v-tax">12%</span></div>
+        <input type="range" min="0" max="40" step="1" value="12" id="s-tax" oninput="profit()">
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head">Результат</div>
+        <div class="rg">
+          <div class="ri"><div class="ri-lbl">Валовая прибыль</div><div class="ri-val a" id="o-gross">$1 800</div></div>
+          <div class="ri"><div class="ri-lbl">После расходов</div><div class="ri-val" id="o-oper">$1 000</div></div>
+          <div class="ri"><div class="ri-lbl">Чистая прибыль</div><div class="ri-val g" id="o-net">$880</div></div>
+          <div class="ri"><div class="ri-lbl">Маржа</div><div class="ri-val g" id="o-margin">29%</div></div>
+        </div>
+        <div class="bg-row">
+          <div class="bg-top"><span>Выручка</span><b id="pb-rev">$3 000</b></div>
+          <div class="bg-track"><div class="bg-fill f-blue" style="width:100%"></div></div>
+        </div>
+        <div class="bg-row">
+          <div class="bg-top"><span>Расходы</span><b id="pb-costs">$2 120</b></div>
+          <div class="bg-track"><div class="bg-fill f-gold" id="pf-costs" style="width:71%"></div></div>
+        </div>
+        <div class="bg-row">
+          <div class="bg-top"><span>Чистая прибыль</span><b id="pb-net">$880</b></div>
+          <div class="bg-track"><div class="bg-fill f-green" id="pf-net" style="width:29%"></div></div>
+        </div>
+      </div>
+      <div class="tip">💡 <span id="t-profit">Маржа 29% — хороший уровень для малого бизнеса.</span></div>
+    </div>
+  </div>
+
+  <!-- PRICE -->
+  <div class="panel" id="p-price">
+    <div class="card">
+      <div class="card-head">Твои параметры</div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Желаемая зарплата</span><span class="sg-val" id="v-sal">$1 000</span></div>
+        <input type="range" min="200" max="10000" step="100" value="1000" id="s-sal" oninput="price()">
+      </div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Часов в месяц</span><span class="sg-val" id="v-hrs">120 ч</span></div>
+        <input type="range" min="20" max="200" step="5" value="120" id="s-hrs" oninput="price()">
+      </div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Налоги и расходы</span><span class="sg-val" id="v-ptax">20%</span></div>
+        <input type="range" min="0" max="50" step="1" value="20" id="s-ptax" oninput="price()">
+      </div>
+      <div class="sg">
+        <div class="sg-top"><span class="sg-name">Наценка на прибыль</span><span class="sg-val" id="v-mk">30%</span></div>
+        <input type="range" min="0" max="100" step="5" value="30" id="s-mk" oninput="price()">
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head">Результат</div>
+        <div class="rg">
+          <div class="ri"><div class="ri-lbl">Мин. ставка/час</div><div class="ri-val" id="o-rate">$10.4</div></div>
+          <div class="ri"><div class="ri-lbl">С наценкой/час</div><div class="ri-val a" id="o-ratem">$13.5</div></div>
+          <div class="ri"><div class="ri-lbl">Проект 8 часов</div><div class="ri-val" id="o-p8">$108</div></div>
+          <div class="ri"><div class="ri-lbl">Проект 40 часов</div><div class="ri-val g" id="o-p40">$540</div></div>
+        </div>
+        <div class="bg-row">
+          <div class="bg-top"><span>Мин. ставка</span><b id="prb-min">$10.4/ч</b></div>
+          <div class="bg-track"><div class="bg-fill f-gold" id="prf-min" style="width:77%"></div></div>
+        </div>
+        <div class="bg-row">
+          <div class="bg-top"><span>Рекомендуемая</span><b id="prb-rec">$13.5/ч</b></div>
+          <div class="bg-track"><div class="bg-fill f-green" style="width:100%"></div></div>
+        </div>
+      </div>
+      <div class="tip">💡 <span id="t-price">Минимум $10.4/час обеспечит тебе $1 000 чистыми.</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="main" id="how">
+  <div class="sec-tag">Как использовать</div>
+  <div class="sec-title">Три шага к результату</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-n">01</div>
+      <div class="step-t">Выбери калькулятор</div>
+      <p class="step-d">ROI рекламы, прибыль или правильная цена — выбери нужную задачу.</p>
+    </div>
+    <div class="step">
+      <div class="step-n">02</div>
+      <div class="step-t">Двигай слайдеры</div>
+      <p class="step-d">Вводи свои цифры и смотри результаты в реальном времени.</p>
+    </div>
+    <div class="step">
+      <div class="step-n">03</div>
+      <div class="step-t">Получи совет</div>
+      <p class="step-d">Умные подсказки объяснят что означают цифры и что улучшить.</p>
+    </div>
+  </div>
+</div>
+
+<div class="cta">
+  <h2>Готов расти?</h2>
+  <p>Используй калькуляторы каждый месяц чтобы следить за показателями бизнеса.</p>
+  <a href="#calc" class="btn">Начать расчёт бесплатно</a>
+</div>
+
+<footer>
+  <div class="fl">Бизнес<span>Калк</span></div>
+  <p>Сделано для умного бизнеса</p>
+</footer>
+
+<script>
+function g(id) { return document.getElementById(id); }
+function fmt(n) { return Math.round(n).toLocaleString('ru-RU'); }
+function D(n)   { return '$' + fmt(n); }
+function P(n)   { return Math.round(n) + '%'; }
+
+function sw(name, btn) {
+  document.querySelectorAll('.panel').forEach(function(el) { el.classList.remove('on'); });
+  document.querySelectorAll('.tab').forEach(function(el) { el.classList.remove('on'); });
+  g('p-' + name).classList.add('on');
+  btn.classList.add('on');
+}
+
+function roi() {
+  var b  = +g('s-budget').value;
+  var c  = +g('s-cpc').value;
+  var cv = +g('s-conv').value;
+  var ch = +g('s-check').value;
+
+  g('v-budget').textContent = D(b);
+  g('v-cpc').textContent    = '$' + c.toFixed(2);
+  g('v-conv').textContent   = cv + '%';
+  g('v-check').textContent  = D(ch);
+
+  var clicks  = b / c;
+  var clients = clicks * (cv / 100);
+  var rev     = clients * ch;
+  var net     = rev - b;
+  var r       = ((rev - b) / b) * 100;
+
+  g('o-clicks').textContent  = fmt(clicks);
+  g('o-clients').textContent = fmt(clients);
+  g('o-revenue').textContent = D(rev);
+  g('o-roi').textContent     = P(r);
+  g('o-roi').className       = 'ri-val ' + (r >= 0 ? 'g' : 'r');
+
+  var mx = Math.max(b, rev, 1);
+  g('bb-cost').textContent = D(b);
+  g('bb-rev').textContent  = D(rev);
+  g('bb-net').textContent  = D(net);
+  g('bf-cost').style.width = Math.round(b / mx * 100) + '%';
+  g('bf-rev').style.width  = Math.round(rev / mx * 100) + '%';
+  g('bf-net').style.width  = Math.max(0, Math.round(net / mx * 100)) + '%';
+
+  var pd = (rev / b).toFixed(1);
+  g('t-roi').textContent = r >= 400
+    ? 'На каждый $1 ты получаешь $' + pd + '. Отличный результат!'
+    : r >= 0
+    ? 'Результат положительный. Улучши конверсию чтобы выйти на 400%+ ROI.'
+    : 'Реклама убыточна. Снижай стоимость клика или поднимай средний чек.';
+}
+
+function profit() {
+  var rev   = +g('s-rev').value;
+  var cogs  = +g('s-cogs').value;
+  var fixed = +g('s-fixed').value;
+  var tax   = +g('s-tax').value;
+
+  g('v-rev').textContent   = D(rev);
+  g('v-cogs').textContent  = cogs + '%';
+  g('v-fixed').textContent = D(fixed);
+  g('v-tax').textContent   = tax + '%';
+
+  var gross  = rev * (1 - cogs / 100);
+  var oper   = gross - fixed;
+  var net    = oper * (1 - tax / 100);
+  var margin = (net / rev) * 100;
+  var costs  = rev - net;
+
+  g('o-gross').textContent  = D(gross);
+  g('o-oper').textContent   = D(oper);
+  g('o-net').textContent    = D(net);
+  g('o-net').className      = 'ri-val ' + (net >= 0 ? 'g' : 'r');
+  g('o-margin').textContent = P(margin);
+  g('o-margin').className   = 'ri-val ' + (margin >= 20 ? 'g' : margin >= 0 ? 'a' : 'r');
+
+  g('pb-rev').textContent   = D(rev);
+  g('pb-costs').textContent = D(costs);
+  g('pb-net').textContent   = D(net);
+  g('pf-costs').style.width = Math.min(100, Math.round(costs / rev * 100)) + '%';
+  g('pf-net').style.width   = Math.max(0, Math.min(100, Math.round(net / rev * 100))) + '%';
+
+  g('t-profit').textContent = margin >= 30
+    ? 'Маржа ' + Math.round(margin) + '% — отличный результат!'
+    : margin >= 15
+    ? 'Маржа ' + Math.round(margin) + '% — хороший уровень для малого бизнеса.'
+    : margin >= 0
+    ? 'Маржа низкая. Сократи расходы или подними цены.'
+    : 'Бизнес убыточен. Срочно пересмотри структуру расходов.';
+}
+
+function price() {
+  var sal    = +g('s-sal').value;
+  var hrs    = +g('s-hrs').value;
+  var tax    = +g('s-ptax').value;
+  var markup = +g('s-mk').value;
+
+  g('v-sal').textContent  = D(sal);
+  g('v-hrs').textContent  = hrs + ' ч';
+  g('v-ptax').textContent = tax + '%';
+  g('v-mk').textContent   = markup + '%';
+
+  var needed = sal / (1 - tax / 100);
+  var minR   = needed / hrs;
+  var recR   = minR * (1 + markup / 100);
+  var p8     = recR * 8;
+  var p40    = recR * 40;
+
+  g('o-rate').textContent  = '$' + minR.toFixed(1);
+  g('o-ratem').textContent = '$' + recR.toFixed(1);
+  g('o-p8').textContent    = D(p8);
+  g('o-p40').textContent   = D(p40);
+  g('prb-min').textContent = '$' + minR.toFixed(1) + '/ч';
+  g('prb-rec').textContent = '$' + recR.toFixed(1) + '/ч';
+  g('prf-min').style.width = Math.round(minR / recR * 100) + '%';
+
+  g('t-price').textContent = 'Минимум $' + minR.toFixed(1) + '/час. С наценкой $' + recR.toFixed(1) + '/час — это даст тебе ' + D(sal) + ' чистыми в месяц.';
+}
+
+roi();
+profit();
+price();
+</script>
+</body>
+</html>
